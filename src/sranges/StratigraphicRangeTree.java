@@ -19,12 +19,13 @@ public class StratigraphicRangeTree extends Tree {
     }
 
     public void initSRanges(){
+        if(rangeInput.get() != null){
 
-
+        }
     }
 
     public List<StratigraphicRange> getStratigraphicRanges(){
-        return null;
+        return ranges;
     }
 
 }
