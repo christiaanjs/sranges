@@ -21,12 +21,9 @@ public class StratigraphicRangeTreeInitTest {
         String newick = String.format("(((%s:1.0,%s:0.0):0.5, %s:0.0):0.5,%s:1.5)", taxonIds);
         List<Taxon> taxa = Arrays.stream(taxonIds).map(i -> new Taxon(i)).collect(Collectors.toList());
 
-        StratigraphicRange multiRange = new StratigraphicRange();
-        multiRange.setInputValue("firstOccurrence", taxa.get(2));
-        multiRange.setInputValue("lastOccurrence", taxa.get(0));
+        StratigraphicRange multiRange = new StratigraphicRange(taxa.get(2), taxa.get(0));
 
-        StratigraphicRange singleRange = new StratigraphicRange();
-        singleRange.setInputValue("firstOccurrence", taxa.get(3));
+        StratigraphicRange singleRange = new StratigraphicRange(taxa.get(3));
 
         List<StratigraphicRange> ranges = Arrays.asList(multiRange, singleRange);
 
@@ -54,12 +51,12 @@ public class StratigraphicRangeTreeInitTest {
 
         List<Node> singleFossilRangeNodes = singleFossilRanges.get(0).getSampledNodes();
         assertEquals(1, singleFossilRangeNodes.size());
-        assertEquals(singleFossilRangeNodes.get(0), taxonIds[3]);
+        assertEquals(singleFossilRangeNodes.get(0).getID(), taxonIds[3]);
 
         List<Node> multiFossilRangeNodes = multiFossilRanges.get(0).getSampledNodes();
         assertEquals(3, multiFossilRangeNodes.size());
         for (int i = 0; i < 3; i++) {
-            assertEquals(multiFossilRangeNodes.get(i).getID(), taxonIds[i]);
+            assertEquals(multiFossilRangeNodes.get(i).getID(), taxonIds[2 - i]);
         }
     }
 
@@ -140,12 +137,9 @@ public class StratigraphicRangeTreeInitTest {
         String newick = String.format("(((%s:1.0,%s:0.0):0.5, %s:0.0):0.5,%s:1.5)", taxonIds);
         List<Taxon> taxa = Arrays.stream(taxonIds).map(i -> new Taxon(i)).collect(Collectors.toList());
 
-        StratigraphicRange multiRange = new StratigraphicRange();
-        multiRange.setInputValue("firstOccurrence", taxa.get(3));
-        multiRange.setInputValue("lastOccurrence", taxa.get(0));
+        StratigraphicRange multiRange = new StratigraphicRange(taxa.get(3), taxa.get(0));
 
-        StratigraphicRange singleRange = new StratigraphicRange();
-        singleRange.setInputValue("firstOccurrence", taxa.get(2));
+        StratigraphicRange singleRange = new StratigraphicRange(taxa.get(2));
 
         List<StratigraphicRange> ranges = Arrays.asList(multiRange, singleRange);
 
@@ -167,12 +161,9 @@ public class StratigraphicRangeTreeInitTest {
         String newick = String.format("((%s:1.0,%s:0.0):0.5, %s:0.0)", taxonIds);
         List<Taxon> taxa = Arrays.stream(taxonIds).map(i -> new Taxon(i)).collect(Collectors.toList());
 
-        StratigraphicRange multiRange = new StratigraphicRange();
-        multiRange.setInputValue("firstOccurrence", taxa.get(2));
-        multiRange.setInputValue("lastOccurrence", taxa.get(0));
+        StratigraphicRange multiRange = new StratigraphicRange(taxa.get(2), taxa.get(0));
 
-        StratigraphicRange singleRange = new StratigraphicRange();
-        singleRange.setInputValue("firstOccurrence", taxa.get(1));
+        StratigraphicRange singleRange = new StratigraphicRange(taxa.get(1));
 
         List<StratigraphicRange> ranges = Arrays.asList(multiRange, singleRange);
 
@@ -186,6 +177,31 @@ public class StratigraphicRangeTreeInitTest {
         exceptionRule.expect(StratigraphicRangeException.class);
 
         tree.initAndValidate();
+    }
+
+    @Test
+    public void testTaxonSetInitMissingSampledNodeFails(){
+        String[] taxonIds = new String[]{"A", "B", "C", "D"};
+        String newick = String.format("(((%s:1.0,%s:0.0):0.5, %s:0.0):0.5,%s:1.5)", taxonIds);
+        List<Taxon> taxa = Arrays.stream(taxonIds)
+                .limit(3)
+                .map(i -> new Taxon(i)).collect(Collectors.toList());
+
+        StratigraphicRange multiRange = new StratigraphicRange(taxa.get(2), taxa.get(0));
+
+        List<StratigraphicRange> ranges = Arrays.asList(multiRange);
+
+        StratigraphicRangeTree tree = new StratigraphicRangeTree();
+        TreeParser parser = new TreeParser(newick);
+        parser.setInputValue("initial", tree);
+        parser.initAndValidate();
+
+        tree.setInputValue("ranges", ranges);
+
+        exceptionRule.expect(StratigraphicRangeException.class);
+
+        tree.initAndValidate();
+
     }
 
 }
