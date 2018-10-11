@@ -3,6 +3,7 @@ package sranges;
 import beast.evolution.alignment.Taxon;
 import beast.evolution.tree.Node;
 import beast.util.TreeParser;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -61,6 +62,7 @@ public class StratigraphicRangeTreeInitTest {
     }
 
     @Test
+    @Ignore("Possible future functionality")
     public void testNodeNameInit() {
         String[] taxonIds = new String[]{"A", "B", "C", "D"};
 
