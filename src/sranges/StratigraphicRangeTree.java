@@ -11,9 +11,13 @@ import java.util.stream.Collectors;
 public class StratigraphicRangeTree extends Tree {
 
     public Input<List<StratigraphicRange>> rangeInput = new Input<>("ranges",
-            "Stratigraphic range information", new ArrayList<>());
+            "Stratigraphic range information", new ArrayList<>(), Input.Validate.REQUIRED);
 
     private List<StratigraphicRange> ranges;
+
+    public StratigraphicRangeTree() {
+        setInputValue(nodeTypeInput.getName(), StratigraphicRangeNode.class.getName());
+    }
 
     public void initAndValidate(){
         super.initAndValidate();
@@ -55,8 +59,7 @@ public class StratigraphicRangeTree extends Tree {
                 throw new StratigraphicRangeException(String.format("%d sampled nodes not assigned to ranges", sampledNodes.size()));
             }
         } else {
-            // Initialise from labels
-            // or fail
+            throw new StratigraphicRangeException("Stratigraphic range input must be specified");
         }
     }
 

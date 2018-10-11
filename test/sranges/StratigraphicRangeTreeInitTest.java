@@ -16,6 +16,14 @@ import static org.junit.Assert.*;
 
 public class StratigraphicRangeTreeInitTest {
 
+    private static StratigraphicRangeTree constructWithNewick(String newick){
+        TreeParser parser = new TreeParser(newick);
+        StratigraphicRangeTree tree = new StratigraphicRangeTree();
+        parser.setInputValue("initial", tree);
+        parser.initAndValidate();
+        return tree;
+    }
+
     @Test
     public void testTaxonSetInit() {
         String[] taxonIds = new String[]{"A", "B", "C", "D"};
@@ -28,10 +36,7 @@ public class StratigraphicRangeTreeInitTest {
 
         List<StratigraphicRange> ranges = Arrays.asList(multiRange, singleRange);
 
-        StratigraphicRangeTree tree = new StratigraphicRangeTree();
-        TreeParser parser = new TreeParser(newick);
-        parser.setInputValue("initial", tree);
-        parser.initAndValidate();
+        StratigraphicRangeTree tree = constructWithNewick(newick);
 
         tree.setInputValue("ranges", ranges);
         tree.initAndValidate();
@@ -50,11 +55,11 @@ public class StratigraphicRangeTreeInitTest {
         assertEquals(singleFossilRanges.size(), 1);
         assertEquals(multiFossilRanges.size(), 1);
 
-        List<Node> singleFossilRangeNodes = singleFossilRanges.get(0).getSampledNodes();
+        List<StratigraphicRangeNode> singleFossilRangeNodes = singleFossilRanges.get(0).getSampledNodes();
         assertEquals(1, singleFossilRangeNodes.size());
         assertEquals(singleFossilRangeNodes.get(0).getID(), taxonIds[3]);
 
-        List<Node> multiFossilRangeNodes = multiFossilRanges.get(0).getSampledNodes();
+        List<StratigraphicRangeNode> multiFossilRangeNodes = multiFossilRanges.get(0).getSampledNodes();
         assertEquals(3, multiFossilRangeNodes.size());
         for (int i = 0; i < 3; i++) {
             assertEquals(multiFossilRangeNodes.get(i).getID(), taxonIds[2 - i]);
@@ -80,10 +85,7 @@ public class StratigraphicRangeTreeInitTest {
 
         String newick = String.format("(((%s:1.0,%s:0.0):0.5, %s:0.0):0.5,%s:1.5)", nodeIdentifiers);
 
-        StratigraphicRangeTree tree = new StratigraphicRangeTree();
-        TreeParser parser = new TreeParser(newick);
-        parser.setInputValue("initial", tree);
-        parser.initAndValidate();
+        StratigraphicRangeTree tree = constructWithNewick(newick);
 
         tree.initAndValidate();
 
@@ -101,11 +103,11 @@ public class StratigraphicRangeTreeInitTest {
         assertEquals(singleFossilRanges.size(), 1);
         assertEquals(multiFossilRanges.size(), 1);
 
-        List<Node> singleFossilRangeNodes = singleFossilRanges.get(0).getSampledNodes();
+        List<StratigraphicRangeNode> singleFossilRangeNodes = singleFossilRanges.get(0).getSampledNodes();
         assertEquals(1, singleFossilRangeNodes.size());
         assertEquals(singleFossilRangeNodes.get(0), taxonIds[3]);
 
-        List<Node> multiFossilRangeNodes = multiFossilRanges.get(0).getSampledNodes();
+        List<StratigraphicRangeNode> multiFossilRangeNodes = multiFossilRanges.get(0).getSampledNodes();
         assertEquals(3, multiFossilRangeNodes.size());
         for (int i = 0; i < 3; i++) {
             assertEquals(multiFossilRangeNodes.get(i).getID(), taxonIds[i]);
@@ -121,10 +123,7 @@ public class StratigraphicRangeTreeInitTest {
         String[] taxonIds = new String[]{ "A", "B", "C", "D" };
         String newick = String.format("(((%s:1.0,%s:0.0):0.5, %s:0.0):0.5,%s:1.5)", taxonIds);
 
-        StratigraphicRangeTree tree = new StratigraphicRangeTree();
-        TreeParser parser = new TreeParser(newick);
-        parser.setInputValue("initial", tree);
-        parser.initAndValidate();
+        StratigraphicRangeTree tree = constructWithNewick(newick);
 
         exceptionRule.expect(StratigraphicRangeException.class);
 
@@ -145,10 +144,7 @@ public class StratigraphicRangeTreeInitTest {
 
         List<StratigraphicRange> ranges = Arrays.asList(multiRange, singleRange);
 
-        StratigraphicRangeTree tree = new StratigraphicRangeTree();
-        TreeParser parser = new TreeParser(newick);
-        parser.setInputValue("initial", tree);
-        parser.initAndValidate();
+        StratigraphicRangeTree tree = constructWithNewick(newick);
 
         tree.setInputValue("ranges", ranges);
 
@@ -169,10 +165,7 @@ public class StratigraphicRangeTreeInitTest {
 
         List<StratigraphicRange> ranges = Arrays.asList(multiRange, singleRange);
 
-        StratigraphicRangeTree tree = new StratigraphicRangeTree();
-        TreeParser parser = new TreeParser(newick);
-        parser.setInputValue("initial", tree);
-        parser.initAndValidate();
+        StratigraphicRangeTree tree = constructWithNewick(newick);
 
         tree.setInputValue("ranges", ranges);
 
@@ -193,10 +186,7 @@ public class StratigraphicRangeTreeInitTest {
 
         List<StratigraphicRange> ranges = Arrays.asList(multiRange);
 
-        StratigraphicRangeTree tree = new StratigraphicRangeTree();
-        TreeParser parser = new TreeParser(newick);
-        parser.setInputValue("initial", tree);
-        parser.initAndValidate();
+        StratigraphicRangeTree tree = constructWithNewick(newick);
 
         tree.setInputValue("ranges", ranges);
 
