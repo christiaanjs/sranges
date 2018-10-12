@@ -27,7 +27,7 @@ public class StratigraphicRangeTree extends Tree {
     public void initSRanges(){
         if(rangeInput.get() != null){
             ranges = rangeInput.get();
-            Map<String, Node> sampledNodes = getSampledNodesIdMap();
+            Map<String, StratigraphicRangeNode> sampledNodes = getSampledNodesIdMap();
             for(StratigraphicRange range: ranges) {
                 Node firstOccurrence = sampledNodes.remove(range.getFirstOccurrenceId());
                 if(firstOccurrence != null){
@@ -43,16 +43,18 @@ public class StratigraphicRangeTree extends Tree {
                             next = next.getParent().getNonDirectAncestorChild();
                         } else if(next.isFake()){
                             next = next.getDirectAncestorChild();
-                        } else { // Speciation event or leaf
+                        } else if(next.isLeaf()){
                             if(!rangeEnded){
                                 throw new StratigraphicRangeException("Range ended before finding last occurrence");
                             } else { // Sampled leaf
                                 sampledNodes.remove(next.getID());
                             }
+                        } else { // Range speciation event
+                            next = next.getLeft();
                         }
                     }
                 } else {
-                    throw new StratigraphicRangeException(String.format("Missing sampled node with ID %s", range.getFirstOccurrenceId()));
+                    throw new StratigraphicRangeException(String.format("Missing sampled node with ID %s (possibly in two ranges)", range.getFirstOccurrenceId()));
                 }
             }
             if(!sampledNodes.isEmpty()){
@@ -67,10 +69,19 @@ public class StratigraphicRangeTree extends Tree {
         return ranges;
     }
 
-    private Map<String, Node> getSampledNodesIdMap(){
+    private Map<String, StratigraphicRangeNode> getSampledNodesIdMap(){
         return Arrays.stream(getNodesAsArray())
+                .map(n -> (StratigraphicRangeNode) n)
                 .filter(n -> n.isLeaf() || n.isDirectAncestor())
                 .collect(Collectors.toMap(n -> n.getID(), Function.identity()));
+    }
+
+    public StratigraphicRangeNode getSampledNodeById(String id){
+        return getSampledNodesIdMap().get(id);
+    }
+
+    public StratigraphicRangeNode getRoot(){
+        return (StratigraphicRangeNode) root;
     }
 
 
