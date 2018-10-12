@@ -20,8 +20,8 @@ public class StratigraphicRange extends BEASTObject {
     private Taxon firstOccurrence;
     private Taxon lastOccurrence;
 
-    private List<Node> nodes = new LinkedList<>();
-    private List<Node> sampledNodes = new LinkedList<>();
+    private List<StratigraphicRangeNode> nodes = new LinkedList<>();
+    private List<StratigraphicRangeNode> sampledNodes = new LinkedList<>();
 
     public StratigraphicRange(Taxon firstOccurrence, Taxon lastOccurrence){
         firstOccurrenceInput.setValue(firstOccurrence, this);
@@ -45,7 +45,7 @@ public class StratigraphicRange extends BEASTObject {
         return (firstOccurrence == null && (sampledNodes.size() == 1)) || lastOccurrence == null;
     }
 
-    public List<Node> getSampledNodes(){
+    public List<StratigraphicRangeNode> getSampledNodes(){
         return sampledNodes;
     }
 
@@ -58,10 +58,16 @@ public class StratigraphicRange extends BEASTObject {
     }
 
     public void appendNode(Node node){
-        // TODO: Node to parent references
-        nodes.add(node);
-        if(node.isDirectAncestor() || node.isLeaf()){
-            sampledNodes.add(node);
+        if(node instanceof StratigraphicRangeNode){
+            StratigraphicRangeNode srNode = (StratigraphicRangeNode) node;
+            nodes.add(srNode);
+            if(srNode.isDirectAncestor() || srNode.isLeaf()){
+                sampledNodes.add(srNode);
+            }
+            srNode.setRange(this);
+        } else {
+            throw new IllegalArgumentException("Attempted to add a non-StratigraphicRangeNode to a range");
         }
+
     }
 }
