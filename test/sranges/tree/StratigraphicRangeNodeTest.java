@@ -1,14 +1,17 @@
-package sranges;
+package sranges.tree;
 
 import beast.evolution.alignment.Taxon;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import sranges.TestUtil;
+import sranges.tree.NodeSymmetryException;
+import sranges.tree.StratigraphicRange;
+import sranges.tree.StratigraphicRangeNode;
+import sranges.tree.StratigraphicRangeTree;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class StratigraphicRangeNodeTest {
 

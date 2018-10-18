@@ -1,4 +1,4 @@
-package sranges;
+package sranges.tree;
 
 import beast.core.BEASTObject;
 import beast.core.Input;

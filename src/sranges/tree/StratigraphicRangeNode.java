@@ -1,4 +1,4 @@
-package sranges;
+package sranges.tree;
 
 import beast.evolution.tree.Node;
 
@@ -47,4 +47,6 @@ public class StratigraphicRangeNode extends Node {
     public boolean isRangeNode(){
         return range != null;
     }
+
+
 }

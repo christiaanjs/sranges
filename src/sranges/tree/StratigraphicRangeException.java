@@ -1,4 +1,4 @@
-package sranges;
+package sranges.tree;
 
 public class StratigraphicRangeException extends RuntimeException {
     public StratigraphicRangeException(String message){

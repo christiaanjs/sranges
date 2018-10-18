@@ -1,10 +1,16 @@
-package sranges;
+package sranges.tree;
 
 import beast.evolution.alignment.Taxon;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import sranges.TestUtil;
+import sranges.tree.StratigraphicRange;
+import sranges.tree.StratigraphicRangeException;
+import sranges.tree.StratigraphicRangeNode;
+import sranges.tree.StratigraphicRangeTree;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +38,7 @@ public class StratigraphicRangeTreeInitTest {
         tree.initAndValidate();
 
         List<StratigraphicRange> initialisedRanges = tree.getStratigraphicRanges();
-        assertEquals(2, initialisedRanges.size());
+        Assert.assertEquals(2, initialisedRanges.size());
 
         List<StratigraphicRange> singleFossilRanges = initialisedRanges.stream()
                 .filter(StratigraphicRange::isSingleFossilRange)
@@ -42,17 +48,17 @@ public class StratigraphicRangeTreeInitTest {
                 .filter(r -> !r.isSingleFossilRange())
                 .collect(Collectors.toList());
 
-        assertEquals(singleFossilRanges.size(), 1);
-        assertEquals(multiFossilRanges.size(), 1);
+        Assert.assertEquals(singleFossilRanges.size(), 1);
+        Assert.assertEquals(multiFossilRanges.size(), 1);
 
         List<StratigraphicRangeNode> singleFossilRangeNodes = singleFossilRanges.get(0).getSampledNodes();
-        assertEquals(1, singleFossilRangeNodes.size());
-        assertEquals(singleFossilRangeNodes.get(0).getID(), taxonIds[3]);
+        Assert.assertEquals(1, singleFossilRangeNodes.size());
+        Assert.assertEquals(singleFossilRangeNodes.get(0).getID(), taxonIds[3]);
 
         List<StratigraphicRangeNode> multiFossilRangeNodes = multiFossilRanges.get(0).getSampledNodes();
-        assertEquals(3, multiFossilRangeNodes.size());
+        Assert.assertEquals(3, multiFossilRangeNodes.size());
         for (int i = 0; i < 3; i++) {
-            assertEquals(multiFossilRangeNodes.get(i).getID(), taxonIds[2 - i]);
+            Assert.assertEquals(multiFossilRangeNodes.get(i).getID(), taxonIds[2 - i]);
         }
     }
 
@@ -74,10 +80,10 @@ public class StratigraphicRangeTreeInitTest {
         tree.initAndValidate();
 
         List<StratigraphicRange> initialisedRanges = tree.getStratigraphicRanges();
-        assertEquals(ranges.size(), initialisedRanges.size());
+        Assert.assertEquals(ranges.size(), initialisedRanges.size());
         long multiRangesCount = initialisedRanges.stream().filter(r -> !r.isSingleFossilRange()).count();
-        assertEquals(1, multiRangesCount);
-        assertTrue("A and D must be siblings", tree.getSampledNodeById(dTaxon.getID()).getParent() == tree.getSampledNodeById(aTaxon.getID()).getParent());
+        Assert.assertEquals(1, multiRangesCount);
+        Assert.assertTrue("A and D must be siblings", tree.getSampledNodeById(dTaxon.getID()).getParent() == tree.getSampledNodeById(aTaxon.getID()).getParent());
 
     }
 
@@ -105,7 +111,7 @@ public class StratigraphicRangeTreeInitTest {
         tree.initAndValidate();
 
         List<StratigraphicRange> initialisedRanges = tree.getStratigraphicRanges();
-        assertEquals(2, initialisedRanges.size());
+        Assert.assertEquals(2, initialisedRanges.size());
 
         List<StratigraphicRange> singleFossilRanges = initialisedRanges.stream()
                 .filter(StratigraphicRange::isSingleFossilRange)
@@ -115,17 +121,17 @@ public class StratigraphicRangeTreeInitTest {
                 .filter(r -> !r.isSingleFossilRange())
                 .collect(Collectors.toList());
 
-        assertEquals(singleFossilRanges.size(), 1);
-        assertEquals(multiFossilRanges.size(), 1);
+        Assert.assertEquals(singleFossilRanges.size(), 1);
+        Assert.assertEquals(multiFossilRanges.size(), 1);
 
         List<StratigraphicRangeNode> singleFossilRangeNodes = singleFossilRanges.get(0).getSampledNodes();
-        assertEquals(1, singleFossilRangeNodes.size());
-        assertEquals(singleFossilRangeNodes.get(0), taxonIds[3]);
+        Assert.assertEquals(1, singleFossilRangeNodes.size());
+        Assert.assertEquals(singleFossilRangeNodes.get(0), taxonIds[3]);
 
         List<StratigraphicRangeNode> multiFossilRangeNodes = multiFossilRanges.get(0).getSampledNodes();
-        assertEquals(3, multiFossilRangeNodes.size());
+        Assert.assertEquals(3, multiFossilRangeNodes.size());
         for (int i = 0; i < 3; i++) {
-            assertEquals(multiFossilRangeNodes.get(i).getID(), taxonIds[i]);
+            Assert.assertEquals(multiFossilRangeNodes.get(i).getID(), taxonIds[i]);
         }
     }
 
