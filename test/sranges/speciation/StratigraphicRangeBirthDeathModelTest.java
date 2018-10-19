@@ -94,6 +94,11 @@ public class StratigraphicRangeBirthDeathModelTest {
         assertEquals(bdModel.calculateTreeLogLikelihood(tree), srModel.calculateTreeLogLikelihood(tree), TestUtil.EPSILON);
     }
 
+    private static double qNotated(double t, double c1, double c2){
+        return 4.0 * Math.exp(-c1 * t)/
+                Math.pow(Math.exp(-c1 * t) * (1.0 - c2) + (1.0 + c2) , 2.0);
+    }
+
     // Derivation uses q(t) = 4*exp(-c1*t)/(exp(-c1*t)*(1-c2)+(1+c2))^2
     // sampled-ancestor implementation uses reciprocal
     @Test
@@ -109,12 +114,55 @@ public class StratigraphicRangeBirthDeathModelTest {
         double c1 = model.getC1();
         double c2 = model.getC2();
 
-        double notatedQ = 4.0 *
-                Math.exp(-c1 * t)/
-                Math.pow(Math.exp(-c1 * t) * (1.0 - c2) + (1.0 + c2) , 2.0);
-
-        assertEquals(1.0/notatedQ, model.q(t), TestUtil.EPSILON);
+        assertEquals(1.0/qNotated(t, c1, c2), model.q(t), TestUtil.EPSILON);
     }
 
+    // In case they are implemented separately
+    @Test
+    public void testLogP(){
+        double t = 1.3;
+
+        StratigraphicRangeBirthDeathModel model = getSrModelBirthDeathSamplingSpecialCase();
+        StratigraphicRangeTree tree = getUltrametricTree();
+        model.setInputValue(model.treeInput.getName(), tree);
+        model.initAndValidate();
+        model.updateParameters();
+
+        assertEquals(Math.log(model.p(t)), model.log_p(t), TestUtil.EPSILON);
+    }
+
+    @Test
+    public void testLogQTilde_asym(){
+        double t = 1.3;
+
+        StratigraphicRangeBirthDeathModel model = getSrModelBirthDeathSamplingSpecialCase();
+        StratigraphicRangeTree tree = getUltrametricTree();
+        model.setInputValue(model.treeInput.getName(), tree);
+        model.initAndValidate();
+        model.updateParameters();
+
+        assertEquals(Math.log(model.q_tilde_asym(t)), model.log_q_tilde_asym(t), TestUtil.EPSILON);
+    }
+
+    private static double qTilde_asymNotated(double t, double lambda, double mu, double psi, double c1, double c2){
+        return Math.sqrt(Math.exp(-t*(lambda + mu + psi))*qNotated(t, c1, c2));
+    }
+
+    @Test
+    public void testQTilde_asymReciprocalToNotated(){
+        double t = 1.3;
+
+        StratigraphicRangeBirthDeathModel model = getSrModelBirthDeathSamplingSpecialCase();
+        StratigraphicRangeTree tree = getUltrametricTree();
+        model.setInputValue(model.treeInput.getName(), tree);
+        model.initAndValidate();
+        model.updateParameters();
+
+        double c1 = model.getC1();
+        double c2 = model.getC2();
+
+        assertEquals(1.0/qTilde_asymNotated(t, c1, c2, PSI, LAMBDA, MU), model.q_tilde_asym(t), TestUtil.EPSILON);
+
+    }
 
 }
