@@ -94,5 +94,27 @@ public class StratigraphicRangeBirthDeathModelTest {
         assertEquals(bdModel.calculateTreeLogLikelihood(tree), srModel.calculateTreeLogLikelihood(tree), TestUtil.EPSILON);
     }
 
+    // Derivation uses q(t) = 4*exp(-c1*t)/(exp(-c1*t)*(1-c2)+(1+c2))^2
+    // sampled-ancestor implementation uses reciprocal
+    @Test
+    public void testQReciprocalToNotated(){
+        double t = 1.3;
+
+        StratigraphicRangeBirthDeathModel model = getSrModelBirthDeathSamplingSpecialCase();
+        StratigraphicRangeTree tree = getUltrametricTree();
+        model.setInputValue(model.treeInput.getName(), tree);
+        model.initAndValidate();
+        model.updateParameters();
+
+        double c1 = model.getC1();
+        double c2 = model.getC2();
+
+        double notatedQ = 4.0 *
+                Math.exp(-c1 * t)/
+                Math.pow(Math.exp(-c1 * t) * (1.0 - c2) + (1.0 + c2) , 2.0);
+
+        assertEquals(1.0/notatedQ, model.q(t), TestUtil.EPSILON);
+    }
+
 
 }
