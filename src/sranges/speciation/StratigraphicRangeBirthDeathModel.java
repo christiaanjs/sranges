@@ -58,8 +58,10 @@ public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
                 .mapToDouble(n -> {
                     if(n.isRoot()){
                         return log_q(origin) - log_q(n.getHeight()); // Root branch
+                    } else if(n.endsRangeBranch()) {
+                        return log_q_tilde(n.getRealParent().getHeight()) - log_q_tilde(n.getHeight());
                     } else {
-                        return 0.0; // TODO
+                        return log_q(n.getRealParent().getHeight()) - log_q(n.getHeight());
                     }
                 })
                 .sum();
