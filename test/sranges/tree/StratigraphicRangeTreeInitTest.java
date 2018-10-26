@@ -84,7 +84,7 @@ public class StratigraphicRangeTreeInitTest {
         long multiRangesCount = initialisedRanges.stream().filter(r -> !r.isSingleFossilRange()).count();
         Assert.assertEquals(1, multiRangesCount);
         Assert.assertTrue("A and D must be siblings", tree.getSampledNodeById(dTaxon.getID()).getParent() == tree.getSampledNodeById(aTaxon.getID()).getParent());
-
+        Assert.assertTrue("The asymmetric event must be in the range", multiRange.getNodes().contains(tree.getSampledNodeById(dTaxon.getID()).getParent()));
     }
 
     @Test

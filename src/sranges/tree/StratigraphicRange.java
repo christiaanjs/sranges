@@ -49,6 +49,10 @@ public class StratigraphicRange extends BEASTObject {
         return sampledNodes;
     }
 
+    public List<StratigraphicRangeNode> getNodes() {
+        return nodes;
+    }
+
     public String getFirstOccurrenceId(){
         return firstOccurrence.getID();
     }
@@ -70,4 +74,6 @@ public class StratigraphicRange extends BEASTObject {
         }
 
     }
+
+
 }

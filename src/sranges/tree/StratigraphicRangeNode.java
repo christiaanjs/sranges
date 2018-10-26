@@ -6,8 +6,13 @@ public class StratigraphicRangeNode extends Node {
 
     private StratigraphicRange range;
     private boolean symmetric;
+    private double EPSILON = 1e-12;
 
     public StratigraphicRangeNode(){}
+
+    public StratigraphicRangeTree getTree(){
+        return (StratigraphicRangeTree) m_tree;
+    }
 
 
     public boolean possiblySymmetric(){
@@ -22,7 +27,7 @@ public class StratigraphicRangeNode extends Node {
         }
     }
 
-    public boolean getSymmetric(){
+    public boolean isSymmetric(){
         if(possiblySymmetric()){
             return symmetric;
         } else {
@@ -40,12 +45,47 @@ public class StratigraphicRangeNode extends Node {
         right.setParent(this);
     }
 
+    public StratigraphicRangeNode getParent(){
+        return (StratigraphicRangeNode) super.getParent();
+    }
+
+    public StratigraphicRangeNode getDirectAncestorChild(){
+        return (StratigraphicRangeNode) super.getDirectAncestorChild();
+    }
+
     public void setRange(StratigraphicRange range){
         this.range = range;
     }
 
+    public StratigraphicRangeNode getRealParent(){
+        if(isRoot()){
+            return null;
+        } else {
+            StratigraphicRangeNode parent = getParent();
+            if(isDirectAncestor()){
+                return parent.getParent();
+            } else if(parent.isFake()){
+                return parent.getDirectAncestorChild();
+            } else {
+                return parent;
+            }
+        }
+    }
+
+    public boolean endsRangeBranch(){
+        return !isRoot() && !isFake() && range == getRealParent().range;
+    }
+
     public boolean isRangeNode(){
         return range != null;
+    }
+
+    public boolean isRhoSample(){
+        return isLeaf() && height < EPSILON;
+    }
+
+    public boolean isPsiSample(){
+        return isLeaf() && !isRhoSample();
     }
 
 

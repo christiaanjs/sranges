@@ -5,13 +5,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import sranges.TestUtil;
-import sranges.tree.NodeSymmetryException;
-import sranges.tree.StratigraphicRange;
-import sranges.tree.StratigraphicRangeNode;
-import sranges.tree.StratigraphicRangeTree;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class StratigraphicRangeNodeTest {
 
@@ -94,34 +94,62 @@ public class StratigraphicRangeNodeTest {
     @Test
     public void testGetSymmetricSpeciationSucceeds() {
         StratigraphicRangeNode node = getSpeciationNode();
-        node.getSymmetric();
+        node.isSymmetric();
     }
 
     @Test
     public void testGetSymmetricLeafFails(){
         StratigraphicRangeNode node = getLeafNode();
         exceptionRule.expect(NodeSymmetryException.class);
-        node.getSymmetric();
+        node.isSymmetric();
     }
 
     @Test
     public void testGetSymmetricSAFails(){
         StratigraphicRangeNode node = getSANode();
         exceptionRule.expect(NodeSymmetryException.class);
-        node.getSymmetric();
+        node.isSymmetric();
     }
 
     @Test
     public void testGetSymmetricFakeFails(){
         StratigraphicRangeNode node = getFakeNode();
         exceptionRule.expect(NodeSymmetryException.class);
-        node.getSymmetric();
+        node.isSymmetric();
     }
 
     @Test
     public void testGetSymmetricRangeSpeciationFails(){
         StratigraphicRangeNode node = getRangeSpeciationNode();
         exceptionRule.expect(NodeSymmetryException.class);
-        node.getSymmetric();
+        node.isSymmetric();
     }
+
+    @Test
+    public void testGetRealParentDirectAncestor(){
+        StratigraphicRangeNode rangeSpeciation = getRangeSpeciationNode();
+        StratigraphicRangeNode b = rangeSpeciation.getTree().getSampledNodeById("B");
+        assertEquals(b, rangeSpeciation.getRealParent());
+    }
+
+    @Test
+    public void testGetRealParentRangeSpeciation(){
+        StratigraphicRangeNode rangeSpeciation = getRangeSpeciationNode();
+        StratigraphicRangeNode b = rangeSpeciation.getTree().getSampledNodeById("A");
+        assertEquals(b.getRealParent(), rangeSpeciation);
+    }
+
+    @Test
+    public void testGetRealParentSymmetricSpeciation(){
+        StratigraphicRangeNode speciation = getSpeciationNode();
+        StratigraphicRangeNode b = speciation.getTree().getSampledNodeById("B");
+        assertEquals(b.getRealParent(), speciation);
+    }
+
+    @Test
+    public void testGetRealParentRoot(){
+        StratigraphicRangeNode speciation = getSpeciationNode();
+        assertNull(speciation.getRealParent());
+    }
+
 }

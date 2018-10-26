@@ -7,6 +7,7 @@ import beast.evolution.tree.Tree;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StratigraphicRangeTree extends Tree {
 
@@ -84,6 +85,11 @@ public class StratigraphicRangeTree extends Tree {
         return (StratigraphicRangeNode) root;
     }
 
+    public Stream<StratigraphicRangeNode> getNodeStream(){
+        return Arrays.stream(m_nodes).map(n -> (StratigraphicRangeNode) n);
+    }
 
-
+    public List<StratigraphicRangeNode> getNodeList() {
+        return getNodeStream().collect(Collectors.toList());
+    }
 }
