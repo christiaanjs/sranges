@@ -61,6 +61,14 @@ public class StratigraphicRange extends BEASTObject {
         return lastOccurrence != null ? lastOccurrence.getID() : null;
     }
 
+    public StratigraphicRangeNode getFirstOccurrence(){
+        return sampledNodes.get(0);
+    }
+
+    public StratigraphicRangeNode getLastOccurence(){
+        return sampledNodes.get(sampledNodes.size() - 1);
+    }
+
     public void appendNode(Node node){
         if(node instanceof StratigraphicRangeNode){
             StratigraphicRangeNode srNode = (StratigraphicRangeNode) node;

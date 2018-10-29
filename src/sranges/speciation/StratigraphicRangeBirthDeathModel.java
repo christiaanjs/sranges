@@ -4,8 +4,10 @@ import beast.core.Input;
 import beast.core.parameter.RealParameter;
 import beast.evolution.speciation.SABirthDeathModel;
 import beast.evolution.tree.TreeInterface;
+import javafx.util.Pair;
 import sranges.tree.StratigraphicRangeTree;
 
+import java.util.function.BiFunction;
 import java.util.stream.DoubleStream;
 
 public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
@@ -37,7 +39,7 @@ public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
         updateParameters();
         StratigraphicRangeTree srTree = (StratigraphicRangeTree) tree;
 
-        double conditionContribution = Math.log(1 - p(origin)); // Condition on sampling
+        double conditionContribution = -Math.log(1 - p(origin)); // Condition on sampling
 
         double eventContribution = srTree.getNodeStream()
                 .filter(n -> !n.isFake())
@@ -66,14 +68,23 @@ public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
                 })
                 .sum();
 
-        double rangeContribution = 0.0;
+        double rangeContribution = srTree.getStratigraphicRanges().stream()
+                .map(r -> r.getLastOccurence())
+                .mapToDouble(n -> log_p(n.getHeight()))
+                .sum();
 
-        double unobservedSpeciationContribution = 0.0;
+        BiFunction<Double, Double, Double> unobservedSpeciationTerm = (oldest, ancYoungest) -> Math.log(1.0 - Math.exp(log_q(oldest) - log_q_tilde(oldest) + log_q_tilde(ancYoungest) - log_q(ancYoungest)));
+        double unobservedSpeciationContribution = srTree.getStratigraphicRanges().stream()
+                .map(r -> new Pair<>(r, r.getStraightLineAncestralRange()))
+                .filter(rr -> rr.getValue() != null)
+                .mapToDouble(rr -> unobservedSpeciationTerm.apply(rr.getKey().getFirstOccurrence().getHeight(), rr.getValue().getLastOccurence().getHeight()))
+                .sum();
 
         return conditionContribution +
                 eventContribution +
                 branchContribution +
-                rangeContribution;
+                rangeContribution +
+                unobservedSpeciationContribution;
     }
 
     double getC1(){
@@ -84,9 +95,6 @@ public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
         return c2;
     }
 
-    /*
-     * Expose internal constant for testing
-     */
     protected double q(double t){
         return  4.0 / q(t, c1, c2);
     }
