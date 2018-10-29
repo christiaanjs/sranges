@@ -53,9 +53,6 @@ public class StratigraphicRangeNode extends Node {
         return (StratigraphicRangeNode) super.getDirectAncestorChild();
     }
 
-    public void setRange(StratigraphicRange range){
-        this.range = range;
-    }
 
     public StratigraphicRangeNode getRealParent(){
         if(isRoot()){
@@ -89,4 +86,11 @@ public class StratigraphicRangeNode extends Node {
     }
 
 
+    public StratigraphicRange getRange() {
+        return range;
+    }
+
+    public void setRange(StratigraphicRange range){
+        this.range = range;
+    }
 }

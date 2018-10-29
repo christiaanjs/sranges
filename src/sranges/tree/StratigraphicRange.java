@@ -75,5 +75,28 @@ public class StratigraphicRange extends BEASTObject {
 
     }
 
+    public StratigraphicRange getStraightLineAncestralRange(){
+        StratigraphicRangeNode oldParent = sampledNodes.get(0);
+        StratigraphicRangeNode parent = oldParent.getRealParent();
+
+        boolean foundAncestral = false;
+        while(!foundAncestral){
+            if(parent == null // Root
+                    || (parent.getRange() != null && !parent.isDirectAncestor()) // Range speciation
+                    || parent.getRight() == oldParent // Asymmetric non-range speciation
+                    || (parent.getRange() == null && parent.isSymmetric()) // Symmetric speciation
+                    ){
+                return null;
+            }
+            foundAncestral = parent.getRange() != null;
+
+            oldParent = parent;
+            parent = parent.getRealParent();
+        }
+
+        return oldParent.getRange();
+
+    }
+
 
 }
