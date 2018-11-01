@@ -106,5 +106,7 @@ public class StratigraphicRange extends BEASTObject {
 
     }
 
-
+    public boolean isTipRange() {
+        return !getLastOccurence().isDirectAncestor();
+    }
 }
