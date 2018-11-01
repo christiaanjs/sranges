@@ -68,8 +68,10 @@ public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
                 })
                 .sum();
 
-        double rangeContribution = srTree.getStratigraphicRanges().stream()
+        double psiTipRangeContribution = srTree.getStratigraphicRanges().stream()
+                .filter(r -> r.isTipRange())
                 .map(r -> r.getLastOccurence())
+                .filter(n -> n.isPsiSample())
                 .mapToDouble(n -> log_p(n.getHeight()))
                 .sum();
 
@@ -83,7 +85,7 @@ public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
         return conditionContribution +
                 eventContribution +
                 branchContribution +
-                rangeContribution +
+                psiTipRangeContribution +
                 unobservedSpeciationContribution;
     }
 
