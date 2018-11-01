@@ -2,7 +2,10 @@ package sranges.speciation;
 
 import beast.evolution.alignment.Taxon;
 import beast.evolution.speciation.BirthDeathGernhard08Model;
+import beast.evolution.speciation.SpeciesTreeDistribution;
 import beast.evolution.speciation.YuleModel;
+import beast.evolution.tree.Node;
+import beast.evolution.tree.Tree;
 import org.junit.Test;
 import sranges.TestUtil;
 import sranges.tree.StratigraphicRange;
@@ -18,7 +21,7 @@ import static org.junit.Assert.*;
 public class StratigraphicRangeBirthDeathModelTest {
 
     private static final double ORIGIN = 3.0;
-    private static final double LAMBDA = 1.0;
+    private static final double LAMBDA = 1.2;
     private static final double MU = 0.2;
     private static final double RHO = 0.7;
     private static final double PSI = 1.1;
@@ -59,8 +62,18 @@ public class StratigraphicRangeBirthDeathModelTest {
 
     // Special case tests
 
+    private static final double DELTA = 0.2;
+
+    private static void assertEqualToConstantWhenNodeHeightTweaked(SpeciesTreeDistribution expected, SpeciesTreeDistribution actual, Tree tree, Node node){
+        double initExpected = expected.calculateTreeLogLikelihood(tree);
+        double initActual = actual.calculateTreeLogLikelihood(tree);
+
+        node.setHeight(node.getHeight() + DELTA);
+        assertEquals(expected.calculateTreeLogLikelihood(tree) - initExpected, actual.calculateTreeLogLikelihood(tree) - initActual, TestUtil.EPSILON);
+    }
+
     @Test
-    public void testSpecialCaseYuleConditionOnOrigin() {
+    public void testSpecialCaseYuleToConstantRoot() {
         StratigraphicRangeTree tree = getUltrametricTree();
 
         YuleModel yuleModel = new YuleModel();
@@ -73,7 +86,24 @@ public class StratigraphicRangeBirthDeathModelTest {
         srModel.setInputValue(srModel.treeInput.getName(), tree);
         srModel.initAndValidate();
 
-        assertEquals(yuleModel.calculateTreeLogLikelihood(tree), srModel.calculateTreeLogLikelihood(tree), TestUtil.EPSILON);
+        assertEqualToConstantWhenNodeHeightTweaked(yuleModel, srModel, tree, tree.getRoot());
+    }
+
+    @Test
+    public void testSpecialCaseYuleToConstantNode() {
+        StratigraphicRangeTree tree = getUltrametricTree();
+
+        YuleModel yuleModel = new YuleModel();
+        yuleModel.setInputValue(yuleModel.birthDiffRateParameterInput.getName(), Double.toString(LAMBDA));
+        yuleModel.setInputValue(yuleModel.originHeightParameterInput.getName(), Double.toString(ORIGIN));
+        yuleModel.setInputValue(yuleModel.treeInput.getName(), tree);
+        yuleModel.initAndValidate();
+
+        StratigraphicRangeBirthDeathModel srModel = getSrModel(ORIGIN, LAMBDA, 0.0, 0.0, 1.0, 0.0, 1.0);
+        srModel.setInputValue(srModel.treeInput.getName(), tree);
+        srModel.initAndValidate();
+
+        assertEqualToConstantWhenNodeHeightTweaked(yuleModel, srModel, tree, tree.getSampledNodeById("A").getParent());
     }
 
     private BirthDeathGernhard08Model getBirthDeathSamplingModel() {
