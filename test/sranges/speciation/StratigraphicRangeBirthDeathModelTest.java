@@ -6,6 +6,7 @@ import beast.evolution.speciation.YuleModel;
 import org.junit.Test;
 import sranges.TestUtil;
 import sranges.tree.StratigraphicRange;
+import sranges.tree.StratigraphicRangeNode;
 import sranges.tree.StratigraphicRangeTree;
 
 import java.util.Arrays;
@@ -44,6 +45,8 @@ public class StratigraphicRangeBirthDeathModelTest {
                 .map(i -> new StratigraphicRange(new Taxon(i)))
                 .collect(Collectors.toList());
         tree.setInputValue(tree.rangeInput.getName(), ranges);
+        tree.initAndValidate();
+        tree.getNodeStream().filter(StratigraphicRangeNode::possiblySymmetric).forEach(n  -> n.setSymmetric(true));
         return tree;
     }
 
@@ -59,7 +62,6 @@ public class StratigraphicRangeBirthDeathModelTest {
     @Test
     public void testSpecialCaseYuleConditionOnOrigin() {
         StratigraphicRangeTree tree = getUltrametricTree();
-        tree.initAndValidate();
 
         YuleModel yuleModel = new YuleModel();
         yuleModel.setInputValue(yuleModel.birthDiffRateParameterInput.getName(), Double.toString(LAMBDA));
@@ -89,7 +91,6 @@ public class StratigraphicRangeBirthDeathModelTest {
     @Test
     public void testSpecialCaseBirthDeathSamplingConditionOnOrigin() {
         StratigraphicRangeTree tree = getUltrametricTree();
-        tree.initAndValidate();
 
         StratigraphicRangeBirthDeathModel srModel = getSrModelBirthDeathSamplingSpecialCase();
         srModel.setInputValue(srModel.treeInput.getName(), tree);
