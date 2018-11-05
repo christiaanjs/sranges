@@ -1,11 +1,18 @@
 package sranges.speciation;
 
+import beast.evolution.alignment.Taxon;
 import beast.evolution.speciation.BirthDeathGernhard08Model;
+import beast.evolution.speciation.SABirthDeathModel;
 import beast.evolution.speciation.YuleModel;
 import org.junit.Test;
 import sranges.TestUtil;
+import sranges.tree.StratigraphicRange;
 import sranges.tree.StratigraphicRangeTree;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static sranges.speciation.StratigraphicRangeBirthDeathModelTest.*;
 
@@ -134,7 +141,74 @@ public class StratigraphicRangeBirthDeathModelSpecialCaseTest {
 
 
     @Test
-    public void testSpecialCaseFBD() {
-        fail();
+    public void testSpecialCaseFBDEqualToConstantTip() {
+        String newick = "(((A:0.5,(B:0.5,C:0.0):0.5):0.5,D:0.0):0.5,E:0.0)";
+        Taxon aTaxon = new Taxon("A");
+        Taxon bTaxon = new Taxon("B");
+        Taxon cTaxon = new Taxon("C");
+        Taxon dTaxon = new Taxon("D");
+        Taxon eTaxon = new Taxon("E");
+
+        StratigraphicRange ancestralRange = new StratigraphicRange(eTaxon, dTaxon);
+        StratigraphicRange multiTipRange = new StratigraphicRange(cTaxon, bTaxon);
+        StratigraphicRange singleTipRange = new StratigraphicRange(aTaxon);
+        List<StratigraphicRange> ranges = Arrays.asList(ancestralRange, multiTipRange, singleTipRange);
+        StratigraphicRangeTree tree = TestUtil.constructWithNewick(newick);
+        tree.setInputValue(tree.rangeInput.getName(), ranges);
+        tree.initAndValidate();
+        tree.getSampledNodeById("A").getParent().setSymmetric(true);
+
+        StratigraphicRangeBirthDeathModel srModel = getSrModelFBDSpecialCase();
+        srModel.setInputValue(srModel.treeInput.getName(), tree);
+        srModel.initAndValidate();
+
+        SABirthDeathModel fbdModel = new SABirthDeathModel();
+
+        fbdModel.setInputValue(fbdModel.originInput.getName(), Double.toString(ORIGIN));
+        fbdModel.setInputValue(fbdModel.birthRateInput.getName(), Double.toString(LAMBDA));
+        fbdModel.setInputValue(fbdModel.deathRateInput.getName(), Double.toString(MU));
+        fbdModel.setInputValue(fbdModel.samplingRateInput.getName(), Double.toString(PSI));
+        fbdModel.setInputValue(fbdModel.rhoProbability.getName(), Double.toString(RHO));
+        fbdModel.setInputValue(fbdModel.removalProbability.getName(), Double.toString(0.0));
+        fbdModel.setInputValue(fbdModel.treeInput.getName(), tree);
+        fbdModel.initAndValidate();
+
+        TestUtil.assertEqualToConstantWhenNodeHeightTweaked(fbdModel, srModel, tree, tree.getSampledNodeById("A"));
+    }
+
+    @Test
+    public void testSpecialCaseFBDEqualToConstantSpeciation() {
+        String newick = "(((A:0.5,(B:0.5,C:0.0):0.5):0.5,D:0.0):0.5,E:0.0)";
+        Taxon aTaxon = new Taxon("A");
+        Taxon bTaxon = new Taxon("B");
+        Taxon cTaxon = new Taxon("C");
+        Taxon dTaxon = new Taxon("D");
+        Taxon eTaxon = new Taxon("E");
+
+        StratigraphicRange ancestralRange = new StratigraphicRange(eTaxon, dTaxon);
+        StratigraphicRange multiTipRange = new StratigraphicRange(cTaxon, bTaxon);
+        StratigraphicRange singleTipRange = new StratigraphicRange(aTaxon);
+        List<StratigraphicRange> ranges = Arrays.asList(ancestralRange, multiTipRange, singleTipRange);
+        StratigraphicRangeTree tree = TestUtil.constructWithNewick(newick);
+        tree.setInputValue(tree.rangeInput.getName(), ranges);
+        tree.initAndValidate();
+        tree.getSampledNodeById("A").getParent().setSymmetric(true);
+
+        StratigraphicRangeBirthDeathModel srModel = getSrModelFBDSpecialCase();
+        srModel.setInputValue(srModel.treeInput.getName(), tree);
+        srModel.initAndValidate();
+
+        SABirthDeathModel fbdModel = new SABirthDeathModel();
+
+        fbdModel.setInputValue(fbdModel.originInput.getName(), Double.toString(ORIGIN));
+        fbdModel.setInputValue(fbdModel.birthRateInput.getName(), Double.toString(LAMBDA));
+        fbdModel.setInputValue(fbdModel.deathRateInput.getName(), Double.toString(MU));
+        fbdModel.setInputValue(fbdModel.samplingRateInput.getName(), Double.toString(PSI));
+        fbdModel.setInputValue(fbdModel.rhoProbability.getName(), Double.toString(RHO));
+        fbdModel.setInputValue(fbdModel.removalProbability.getName(), Double.toString(0.0));
+        fbdModel.setInputValue(fbdModel.treeInput.getName(), tree);
+        fbdModel.initAndValidate();
+
+        TestUtil.assertEqualToConstantWhenNodeHeightTweaked(fbdModel, srModel, tree, tree.getSampledNodeById("A").getParent());
     }
 }

@@ -8,7 +8,6 @@ import javafx.util.Pair;
 import sranges.tree.StratigraphicRangeTree;
 
 import java.util.function.BiFunction;
-import java.util.stream.DoubleStream;
 
 public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
 
@@ -58,7 +57,7 @@ public class StratigraphicRangeBirthDeathModel extends SABirthDeathModel {
         double branchContribution = srTree.getNodeStream() // Node above each branch
                 .filter(n -> !n.isFake())
                 .mapToDouble(n -> {
-                    if(n.isRoot()){
+                    if(n.isRealRoot()){
                         return log_q(origin) - log_q(n.getHeight()); // Root branch
                     } else if(n.endsRangeBranch()) {
                         return log_q_tilde(n.getRealParent().getHeight()) - log_q_tilde(n.getHeight());

@@ -53,6 +53,10 @@ public class StratigraphicRangeNode extends Node {
         return (StratigraphicRangeNode) super.getDirectAncestorChild();
     }
 
+    public boolean isRealRoot(){
+        return getRealParent() == null;
+    }
+
 
     public StratigraphicRangeNode getRealParent(){
         if(isRoot()){
@@ -70,7 +74,7 @@ public class StratigraphicRangeNode extends Node {
     }
 
     public boolean endsRangeBranch(){
-        return !isRoot() && !isFake() && range == getRealParent().range;
+        return !isRealRoot() && !isFake() && range == getRealParent().range;
     }
 
     public boolean isRangeNode(){
