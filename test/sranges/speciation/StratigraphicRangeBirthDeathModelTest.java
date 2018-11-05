@@ -68,6 +68,7 @@ public class StratigraphicRangeBirthDeathModelTest {
         double initExpected = expected.calculateTreeLogLikelihood(tree);
         double initActual = actual.calculateTreeLogLikelihood(tree);
 
+        assertTrue(Double.isFinite(initActual));
         node.setHeight(node.getHeight() + DELTA);
         assertEquals(expected.calculateTreeLogLikelihood(tree) - initExpected, actual.calculateTreeLogLikelihood(tree) - initActual, TestUtil.EPSILON);
     }
@@ -104,6 +105,48 @@ public class StratigraphicRangeBirthDeathModelTest {
         srModel.initAndValidate();
 
         assertEqualToConstantWhenNodeHeightTweaked(yuleModel, srModel, tree, tree.getSampledNodeById("A").getParent());
+    }
+
+    private BirthDeathGernhard08Model getBirthDeathModel() {
+        BirthDeathGernhard08Model bdModel = new BirthDeathGernhard08Model();
+        bdModel.setInputValue(bdModel.birthDiffRateParameterInput.getName(), Double.toString(LAMBDA - MU));
+        bdModel.setInputValue(bdModel.relativeDeathRateParameterInput.getName(), Double.toString(MU / LAMBDA));
+        bdModel.setInputValue(bdModel.sampleProbabilityInput.getName(), Double.toString(1.0));
+        return bdModel;
+    }
+
+    private static StratigraphicRangeBirthDeathModel getSrModelBirthDeathSpecialCase() {
+        return getSrModel(ORIGIN, LAMBDA, MU, 0.0, 1.0, 0.0, 1.0);
+    }
+
+    @Test
+    public void testSpecialCaseBirthDeathToConstantRoot() {
+        StratigraphicRangeTree tree = getUltrametricTree();
+
+        StratigraphicRangeBirthDeathModel srModel = getSrModelBirthDeathSpecialCase();
+        srModel.setInputValue(srModel.treeInput.getName(), tree);
+        srModel.initAndValidate();
+
+        BirthDeathGernhard08Model bdModel = getBirthDeathModel();
+        bdModel.setInputValue(bdModel.treeInput.getName(), tree);
+        bdModel.initAndValidate();
+
+        assertEqualToConstantWhenNodeHeightTweaked(bdModel, srModel, tree, tree.getRoot());
+    }
+
+    @Test
+    public void testSpecialCaseBirthDeathToConstantNode() {
+        StratigraphicRangeTree tree = getUltrametricTree();
+
+        StratigraphicRangeBirthDeathModel srModel = getSrModelBirthDeathSpecialCase();
+        srModel.setInputValue(srModel.treeInput.getName(), tree);
+        srModel.initAndValidate();
+
+        BirthDeathGernhard08Model bdModel = getBirthDeathModel();
+        bdModel.setInputValue(bdModel.treeInput.getName(), tree);
+        bdModel.initAndValidate();
+
+        assertEqualToConstantWhenNodeHeightTweaked(bdModel, srModel, tree, tree.getSampledNodeById("A").getParent());
     }
 
     private BirthDeathGernhard08Model getBirthDeathSamplingModel() {
